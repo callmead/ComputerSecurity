@@ -1,0 +1,62 @@
+In this lab, the students will explore various strengths and weaknesses of block cipher modes. Also, understand the inner mechanism and some vulnerabilities of RSA algorithm.
+
+Block Ciphering Modes:
+Remember that in a chosen plaintext attack (CPA), the attacker is allowed to put a certain
+number of plaintext queries and get the corresponding ciphertexts. Thus, we can create an interaction game between a Challenger and Adversary.
+* A key 𝑘 for the encryption scheme is chosen uniformly at random by the Challenger.
+* The Adversary, which does not know 𝑘, is given access to an oracle that computes 𝐸𝑛𝑐%(·) on a message 𝑚 of the adversary’s choice.
+* The Adversary chooses two messages of equal length, 𝑚* and 𝑚+, and sends them to the Challenger.
+* The Challenger chooses a random bit 𝑏, produces the challenge ciphertext 𝑐∗ = 𝐸𝑛𝑐%(𝑚0), and sends 𝑐∗ to the adversary.
+* The Adversary may continue to send any message of its choice to the oracle that computes 𝐸𝑛𝑐%(𝑚0).
+* The Adversary outputs 𝑏* = 0 if it thinks that 𝑐∗ was the encryption of 𝑚*, and 𝑏* = 0 otherwise.
+* The Adversary wins if 𝑏* = 0.
+
+Electronic Code Block:
+You know how the ECB mode work. The operation is also depicted in the figure 1 below. Now, consider that you are given with an image “tux.ppm” in PPM format (PPM binary format is a simple image format where the pixels were represented as uncompressed bytes).
+
+1. Modify the above code, encrypt the image “tux.ppm” using ECB mode.
+2. Modify the above code, encrypt the image “tux.ppm” using CBC mode.
+
+Note: When encrypting, remove the three header lines from tux.ppm, and prepend them unencrypted to the ciphertext. After encrypting, you can add the three headers again in the encrypted file to visualize the picture.
+
+3. Now, provide a mechanism to prove that AES in ECB mode is not CPA-secure, i.e. if the attacker has access to the encryption oracle, it can win the above defined game.
+
+Cipher Block Chaining (CBC) Mode:
+As you can see from the below CBC mode, it XORs each ciphertext block with the next plaintext before encryption. For the first block, a random initialization vector (IV) is used instead. Note that the IV needs to be included as part of the ciphertext in order for decryption to be possible.
+
+It has been proven that CBC mode, unlike ECB mode, is CPA-secure if the “block cipher encryption” function is a pseudorandom permutation. However, if the IVs are incremented like a counter instead of being chosen at random, this breaks down, as you will show in this section.
+
+Consider the ciphertext “5c883bb776541dc401eca5a909e0c727” generated from the CBC mode with an initialization vector CBC_iv1=100, and that the ciphertext encrypts the message in CBC_message1: “The plain text!". If the senders use CBC mode correctly, they should be choosing random initialization vectors. Instead, they are incrementing the initialization vector (IV) like a counter, adding 1 to it for every message sent. A few messages later, they will be using a different IV.
+
+Question: What two messages can you specify as 𝑚* and 𝑚+ in the CPA security game when it is time to use CBC_iv2, such that you will be able to tell the difference between the two encryptions?
+
+Output Feedback (OFB) mode:
+Question: Consider that two different messages have an identical block of plain text in the identical position which are used in the OFB mode, is it possible to recover the corresponding 𝑂3 block? If yes, show through mathematical derivation or through writing a program, otherwise give your reason justifying your answer.
+
+RSA Encryption and Decryption:
+a. Remember the RSA encryption/decryption technique, we first choose two primes 𝑝, 𝑞 and then we choose the public key (𝑛, 𝑒) in such way that 𝑒 is relatively prime to 𝜙(𝑛), i.e. gcd<𝑒,𝜙(𝑛)= = 1. In this problem, you are required to observe the consequences of not following the above condition. Assume, 𝑝 = 5, 𝑞 = 13, (i) calculate 𝝓(𝒏). Let’s choose 𝑒 = 3, you will notice that gcd<𝑒,𝜙(𝑛)= ≠ 1. Now, (ii) encrypt 2 and 57. (Hope, you
+remember how to encrypt, 𝐶 = 𝑀G𝑚𝑜𝑑 𝑛 and the fast exponentiation rule: 𝑎𝑏 𝑚𝑜𝑑 𝑛 = ((𝑎 𝑚𝑜𝑑 𝑛) × (𝑏 𝑚𝑜𝑑 𝑛)) 𝑚𝑜𝑑 𝑛). (iii) Can you find the decryption key (d) such that 𝒆𝒅 ≡ 𝟏 𝒎𝒐𝒅 𝝓(𝒏) to decrypt each cipher you found in (ii)? Explain what you have observed.
+
+b. Imagine you are the man in the middle and observing the interactions happening in the RSA algorithm. You found that 𝐶 = 10, 𝑒 = 5, and 𝑁 = 35. Can you find out (decrypt) the corresponding plain text.
+
+Attacking RSA:
+Here, we summarize a naive version of the RSA (“textbook RSA") encryption and digital signatures schemes. This version of RSA should not be used; you will show here several ways in which it can be vulnerable. In reality, to avoid vulnerabilities such as the ones explored here, instead of
+“textbook RSA", RSA PKCS #1 ftp://ftp.rsasecurity.com/pub/pkcs/ascii/pkcs-1.asc) is used. The working mechanism of the RSA algorithm should be pretty clear by now as we discussed in the class. Below is the summary of RSA.
+
+Small Message Space Attack:
+Imagine you are a security officer working for a government and trying to determine when the neighboring country “MaliceLand” will attack. Assume “MaliceLand” has an ally named “HorridLand”, and you were able to sniff the cipher message sent by MaliceLand to HorridLand.
+
+The cipher message can be found in the file “5A_CipherMessage”, which was encrypted using “textbookRSA”. Assume you know that there are three possible messages that MaliceLand can send to HorridLand, such as:
+
+1. "attack tomorrow at dawn"
+2. "attack just before dusk"
+3. "attack early next week"
+
+Let’s consider you know the public key of HorridLand, which is given in the file “HLand_Key.pub”. Use this knowledge to figure out what the message is. What would you do to prevent MaliceLand from executing the same attack on ciphertexts you send?
+
+Small Plaintext and Encryption Exponent Attack:
+In “5A_CipherMessage”, you will find another cipher message sent from MaliceLand to HorridLand. However, this time, you don’t really know what MaliceLand might be saying. You do, however, know that the encryption exponent is 𝑒 = 3, and that MaliceLand tends to be very
+brief and to the point, so you think the message in question is probably very short. Use this knowledge to figure out what the message is.
+
+Defense: Padding A technique that prevents this attack is padding, which is used in PKCS #1. Padding artificially increases the size of the message so that it is almost as big as the modulus 𝑛 by adding extra characters or bits to the message. Why would padding help prevent this attack?
+
